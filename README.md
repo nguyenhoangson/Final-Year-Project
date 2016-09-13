@@ -6,3 +6,11 @@ Code for Final Year Project
 ```
 tensorflow 0.9
 ```
+
+```
+python 3.5.2
+```
+
+```
+pip 8.1.2
+```
