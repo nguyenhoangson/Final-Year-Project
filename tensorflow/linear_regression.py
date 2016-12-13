@@ -2,9 +2,6 @@
 import tensorflow as tf
 import numpy as np
 
-# Session
-sess = tf.Session() 
-
 # Create 100 random x,y data points in NumPy,
 # in which y = x*0.1 + 0.3
 x_data = np.random.rand(100).astype(np.float32)
@@ -25,6 +22,9 @@ y = W * x_data + b
 loss = tf.reduce_mean(tf.square(y - y_data))
 optimizer = tf.train.GradientDescentOptimizer(0.5)
 train = optimizer.minimize(loss)
+
+# Session
+sess = tf.Session() 
 
 # Variables must be then explicitly initialized
 init = tf.initialize_all_variables()
