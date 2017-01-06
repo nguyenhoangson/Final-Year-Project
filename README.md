@@ -1,10 +1,10 @@
 # Final-Year-Project
 Code for Final Year Project
 
-## Prerequisite
+## Tools
 
 ```
-tensorflow 0.9
+tensorflow-gpu 0.12.1
 ```
 
 ```
@@ -12,5 +12,20 @@ python 3.5.2
 ```
 
 ```
-pip 8.1.2
+pip 9.0.1
 ```
+
+```
+CUDA 8.0
+```
+
+```
+CudNN 5.1
+```
+
+## Hardware
+
+```
+NVDIA Quadro K600
+```
+
