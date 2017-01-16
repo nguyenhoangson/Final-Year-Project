@@ -23,6 +23,10 @@ CUDA 8.0
 CudNN 5.1
 ```
 
+```
+Caffe
+```
+
 ## Hardware
 
 ```
