@@ -34,6 +34,7 @@ for folder in $@; do
 	for file in $folder/*/*.jpeg; do
 	    convert "$file" -resize 28x28\! "${file%.*}.png"
 	    file "$file" #uncomment for testing
+	    rm "$file"
 	done
 	echo "Done resizing .jpeg in $folder"
     fi
