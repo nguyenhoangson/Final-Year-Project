@@ -91,11 +91,20 @@ def load_mnist(dataset="training", digits=None, path=None, asbytes=False, select
         magic_nr, size = struct.unpack(">II", flbl.read(8))
         labels_raw = pyarray("b", flbl.read())
         flbl.close()
-
+    
+    # open file 
     fimg = open(images_fname, 'rb')
+    # get meta-data of images 
     magic_nr, size, rows, cols = struct.unpack(">IIII", fimg.read(16))
+    # get pixel data
     images_raw = pyarray("B", fimg.read())
     fimg.close()
+    
+    print(len(images_raw))
+    print(magic_nr)
+    print(size)
+    print(rows)
+    print(cols)
 
     if digits:
         indices = [k for k in range(size) if labels_raw[k] in digits]
@@ -105,7 +114,8 @@ def load_mnist(dataset="training", digits=None, path=None, asbytes=False, select
     if selection:
         indices = indices[selection] 
     N = len(indices)
-
+    
+    # initialize images list as zeros  
     images = zeros((N, rows, cols), dtype=uint8)
 
     if return_labels:
