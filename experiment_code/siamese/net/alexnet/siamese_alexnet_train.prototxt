@@ -1,5 +1,4 @@
 name: "SiameseAlexNet"
-
 ### siamese data layer
 layer {
   name: "pair_data"
@@ -13,7 +12,7 @@ layer {
     scale: 0.00390625
   }
   data_param {
-    source: "examples/siamese/mnist_siamese_train_leveldb"
+    source: "/home/nguyenhoangson/FYP/data/siamese_data_final/leveldb/siamese_train_leveldb"
     batch_size: 64
   }
 }
@@ -29,7 +28,7 @@ layer {
     scale: 0.00390625
   }
   data_param {
-    source: "examples/siamese/mnist_siamese_test_leveldb"
+    source: "/home/nguyenhoangson/FYP/data/siamese_data_final/leveldb/siamese_test_leveldb"
     batch_size: 100
   }
 }
@@ -59,21 +58,23 @@ layer {
     lr_mult: 1
     decay_mult: 1
   }
+
   param {
     name: "conv1_b"
     lr_mult: 2
     decay_mult: 0
   }
+
   convolution_param {
-    num_output: 96
-    kernel_size: 11
+    num_output: 96 # number of filters
+    kernel_size: 11 # height and width of each filter
     stride: 4
     weight_filler {
-      type: "gaussian"
+      type: "gaussian" # initialize the filters from a Gaussian 
       std: 0.01
     }
     bias_filler {
-      type: "constant"
+      type: "constant" # initialize bias to 0
       value: 0
     }
   }
@@ -84,12 +85,6 @@ layer {
   name: "relu1"
   type: "ReLU"
   bottom: "conv1"
-  param {
-     name: "relu1_w"	
-  }
-  param {
-     name: "relu1_b"
-  }
   top: "conv1"
 }
 
@@ -99,12 +94,6 @@ layer {
   type: "LRN"
   bottom: "conv1"
   top: "norm1"
-  param{
-     name: "norm1_w"
-  }
-  param{
-     name: "norm1_b"		
-  } 
   lrn_param {
     local_size: 5
     alpha: 0.0001
@@ -118,12 +107,6 @@ layer {
   type: "Pooling"
   bottom: "norm1"
   top: "pool1"
-  param{
-     name: "pool1_w"
-  }
-  param{
-     name: "pool1_b"
-  } 
   pooling_param {
     pool: MAX
     kernel_size: 3
@@ -168,13 +151,6 @@ layer {
   name: "relu2"
   type: "ReLU"
   bottom: "conv2"
-  param{
-     name: "relu2_w"   
-  }
-
-  param{
-     name: "relu2_b"
-  }
   top: "conv2"
 }
 
@@ -184,12 +160,6 @@ layer {
   type: "LRN"
   bottom: "conv2"
   top: "norm2"
-  param{
-     name: "norm2_w"   
-  }
-  param{
-     name: "norm2_b"   
-  }
   lrn_param {
     local_size: 5
     alpha: 0.0001
@@ -203,12 +173,6 @@ layer {
   type: "Pooling"
   bottom: "norm2"
   top: "pool2"
-  param{
-     name: "pool2_w"   
-  }
-  param{
-     name: "pool2_b"   
-  }
   pooling_param {
     pool: MAX
     kernel_size: 3
@@ -253,12 +217,6 @@ layer {
   type: "ReLU"
   bottom: "conv3"
   top: "conv3"
-  param{
-     name: "relu3_w"   
-  }
-  param{
-     name: "relu3_b"   
-  }
 }
 
 #Done
@@ -299,12 +257,6 @@ layer {
   type: "ReLU"
   bottom: "conv4"
   top: "conv4"
-  param{
-     name: "relu4_w"   
-  }
-  param{
-     name: "relu4_b"   
-  }
 }
 
 #Done
@@ -345,12 +297,6 @@ layer {
   type: "ReLU"
   bottom: "conv5"
   top: "conv5"
-  param{
-     name: "relu5_w"   
-  }
-  param{
-     name: "relu5_b"   
-  }
 }
 
 #Done
@@ -359,12 +305,6 @@ layer {
   type: "Pooling"
   bottom: "conv5"
   top: "pool5"
-  param{
-     name: "pool5_w"   
-  }
-  param{
-     name: "pool5_b"   
-  }
   pooling_param {
     pool: MAX
     kernel_size: 3
@@ -407,30 +347,8 @@ layer {
   type: "ReLU"
   bottom: "fc6"
   top: "fc6"
-  param{
-     name: "relu6_w"   
-  }
-  param{
-     name: "relu6_b"   
-  }
 }
 
-#Done
-layer {
-  name: "drop6"
-  type: "Dropout"
-  bottom: "fc6"
-  top: "fc6"
-  param{
-     name: "drop6_w"   
-  }
-  param{
-     name: "drop6_b"   
-  }
-  dropout_param {
-    dropout_ratio: 0.5
-  }
-}
 
 #Done
 layer {
@@ -467,29 +385,6 @@ layer {
   type: "ReLU"
   bottom: "fc7"
   top: "fc7"
-  param{
-     name: "relu7_w"   
-  }
-  param{
-     name: "relu7_b"   
-  }
-}
-
-#Done
-layer {
-  name: "drop7"
-  type: "Dropout"
-  bottom: "fc7"
-  top: "fc7"
-  param{
-     name: "drop7_w"   
-  }
-  param{
-     name: "drop7_b"   
-  }
-  dropout_param {
-    dropout_ratio: 0.5
-  }
 }
 
 #Done
@@ -520,6 +415,7 @@ layer {
     }
   }
 }
+
 
 ### Net for Image 2 
 
@@ -559,12 +455,6 @@ layer {
   name: "relu1_p"
   type: "ReLU"
   bottom: "conv1_p"
-  param {
-     name: "relu1_w"	
-  }
-  param {
-     name: "relu1_b"
-  }
   top: "conv1_p"
 }
 
@@ -574,12 +464,6 @@ layer {
   type: "LRN"
   bottom: "conv1_p"
   top: "norm1_p"
-  param{
-     name: "norm1_w"
-  }
-  param{
-     name: "norm1_b"		
-  } 
   lrn_param {
     local_size: 5
     alpha: 0.0001
@@ -593,12 +477,6 @@ layer {
   type: "Pooling"
   bottom: "norm1_p"
   top: "pool1_p"
-  param{
-     name: "pool1_w"
-  }
-  param{
-     name: "pool1_b"
-  } 
   pooling_param {
     pool: MAX
     kernel_size: 3
@@ -643,13 +521,6 @@ layer {
   name: "relu2_p"
   type: "ReLU"
   bottom: "conv2_p"
-  param{
-     name: "relu2_w"   
-  }
-
-  param{
-     name: "relu2_b"
-  }
   top: "conv2_p"
 }
 
@@ -659,12 +530,6 @@ layer {
   type: "LRN"
   bottom: "conv2_p"
   top: "norm2_p"
-  param{
-     name: "norm2_w"   
-  }
-  param{
-     name: "norm2_b"   
-  }
   lrn_param {
     local_size: 5
     alpha: 0.0001
@@ -678,12 +543,6 @@ layer {
   type: "Pooling"
   bottom: "norm2_p"
   top: "pool2_p"
-  param{
-     name: "pool2_w"   
-  }
-  param{
-     name: "pool2_b"   
-  }
   pooling_param {
     pool: MAX
     kernel_size: 3
@@ -728,12 +587,6 @@ layer {
   type: "ReLU"
   bottom: "conv3_p"
   top: "conv3_p"
-  param{
-     name: "relu3_w"   
-  }
-  param{
-     name: "relu3_b"   
-  }
 }
 
 #Done
@@ -774,12 +627,6 @@ layer {
   type: "ReLU"
   bottom: "conv4_p"
   top: "conv4_p"
-  param{
-     name: "relu4_w"   
-  }
-  param{
-     name: "relu4_b"   
-  }
 }
 
 #Done
@@ -820,12 +667,6 @@ layer {
   type: "ReLU"
   bottom: "conv5_p"
   top: "conv5_p"
-  param{
-     name: "relu5_w"   
-  }
-  param{
-     name: "relu5_b"   
-  }
 }
 
 #Done
@@ -834,12 +675,6 @@ layer {
   type: "Pooling"
   bottom: "conv5_p"
   top: "pool5_p"
-  param{
-     name: "pool5_w"   
-  }
-  param{
-     name: "pool5_b"   
-  }
   pooling_param {
     pool: MAX
     kernel_size: 3
@@ -882,29 +717,6 @@ layer {
   type: "ReLU"
   bottom: "fc6_p"
   top: "fc6_p"
-  param{
-     name: "relu6_w"   
-  }
-  param{
-     name: "relu6_b"   
-  }
-}
-
-#Done
-layer {
-  name: "drop6_p"
-  type: "Dropout"
-  bottom: "fc6_p"
-  top: "fc6_p"
-  param{
-     name: "drop6_w"   
-  }
-  param{
-     name: "drop6_b"   
-  }
-  dropout_param {
-    dropout_ratio: 0.5
-  }
 }
 
 #Done
@@ -942,30 +754,9 @@ layer {
   type: "ReLU"
   bottom: "fc7_p"
   top: "fc7_p"
-  param{
-     name: "relu7_w"   
-  }
-  param{
-     name: "relu7_b"   
-  }
 }
 
-#Done
-layer {
-  name: "drop7_p"
-  type: "Dropout"
-  bottom: "fc7_p"
-  top: "fc7_p"
-  param{
-     name: "drop7_w"   
-  }
-  param{
-     name: "drop7_b"   
-  }
-  dropout_param {
-    dropout_ratio: 0.5
-  }
-}
+
 
 #Done
 layer {
@@ -996,6 +787,18 @@ layer {
   }
 }
 
+layer{
+   name: "siamese_accuracy"
+   type: "SiameseAccuracy"
+   bottom: "fc8"
+   bottom: "fc8_p"
+   bottom: "sim"
+   top: "siamese_accuracy"
+   include{
+	phase: TEST
+   }
+}
+
 
 # this is contrastive loss layer 
 layer {
@@ -1006,6 +809,6 @@ layer {
   bottom: "sim"
   top: "loss"
   contrastive_loss_param {
-    margin: 1
+    margin: 0.5
   }
 }
