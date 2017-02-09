@@ -1,6 +1,6 @@
 net: "./siamese_alexnet_train.prototxt"
-test_iter: 500
-test_interval: 500
+test_iter: 250
+test_interval: 250
 base_lr: 0.01
 lr_policy: "step"
 gamma: 0.1

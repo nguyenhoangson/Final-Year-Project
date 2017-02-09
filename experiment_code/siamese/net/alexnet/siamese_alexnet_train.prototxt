@@ -13,7 +13,7 @@ layer {
   }
   data_param {
     source: "/home/nguyenhoangson/FYP/data/siamese_data_final/leveldb/siamese_train_leveldb"
-    batch_size: 64
+    batch_size: 4
   }
 }
 layer {
@@ -29,7 +29,7 @@ layer {
   }
   data_param {
     source: "/home/nguyenhoangson/FYP/data/siamese_data_final/leveldb/siamese_test_leveldb"
-    batch_size: 100
+    batch_size: 10
   }
 }
 layer {
@@ -40,7 +40,7 @@ layer {
   top: "data_p"
   slice_param {
     slice_dim: 1
-    slice_point: 1
+    slice_point: 3
   }
 }
 
@@ -314,97 +314,22 @@ layer {
 
 #Done
 layer {
-  name: "fc6"
+  name: "fc"
   type: "InnerProduct"
   bottom: "pool5"
-  top: "fc6"
+  top: "fc"
   param {
-    name: "fc6_w"
+    name: "fc_w"
     lr_mult: 1
     decay_mult: 1
   }
   param {
-    name: "fc6_b"
+    name: "fc_b"
     lr_mult: 2
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 4096
-    weight_filler {
-      type: "gaussian"
-      std: 0.005
-    }
-    bias_filler {
-      type: "constant"
-      value: 0.1
-    }
-  }
-}
-
-#Done
-layer {
-  name: "relu6"
-  type: "ReLU"
-  bottom: "fc6"
-  top: "fc6"
-}
-
-
-#Done
-layer {
-  name: "fc7"
-  type: "InnerProduct"
-  bottom: "fc6"
-  top: "fc7"
-  param {
-    name: "fc7_w"
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    name: "fc7_b"
-    lr_mult: 2
-    decay_mult: 0
-  }
-  inner_product_param {
-    num_output: 4096
-    weight_filler {
-      type: "gaussian"
-      std: 0.005
-    }
-    bias_filler {
-      type: "constant"
-      value: 0.1
-    }
-  }
-}
-
-#Done
-layer {
-  name: "relu7"
-  type: "ReLU"
-  bottom: "fc7"
-  top: "fc7"
-}
-
-#Done
-layer {
-  name: "fc8"
-  type: "InnerProduct"
-  bottom: "fc7"
-  top: "fc8"
-  param {
-    name: "fc8_w"
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    name: "fc8_b"
-    lr_mult: 2
-    decay_mult: 0
-  }
-  inner_product_param {
-    num_output: 1000
+    num_output: 64
     weight_filler {
       type: "gaussian"
       std: 0.01
@@ -682,100 +607,25 @@ layer {
   }
 }
 
+
 #Done
 layer {
-  name: "fc6_p"
+  name: "fc_p"
   type: "InnerProduct"
   bottom: "pool5_p"
-  top: "fc6_p"
+  top: "fc_p"
   param {
-    name: "fc6_w"
+    name: "fc_w"
     lr_mult: 1
     decay_mult: 1
   }
   param {
-    name: "fc6_b"
+    name: "fc_b"
     lr_mult: 2
     decay_mult: 0
   }
   inner_product_param {
-    num_output: 4096
-    weight_filler {
-      type: "gaussian"
-      std: 0.005
-    }
-    bias_filler {
-      type: "constant"
-      value: 0.1
-    }
-  }
-}
-
-#Done
-layer {
-  name: "relu6_p"
-  type: "ReLU"
-  bottom: "fc6_p"
-  top: "fc6_p"
-}
-
-#Done
-layer {
-  name: "fc7_p"
-  type: "InnerProduct"
-  bottom: "fc6_p"
-  top: "fc7_p"
-  param {
-    name: "fc7_w"
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    name: "fc7_b"
-    lr_mult: 2
-    decay_mult: 0
-  }
-  inner_product_param {
-    num_output: 4096
-    weight_filler {
-      type: "gaussian"
-      std: 0.005
-    }
-    bias_filler {
-      type: "constant"
-      value: 0.1
-    }
-  }
-}
-
-#Done
-layer {
-  name: "relu7_p"
-  type: "ReLU"
-  bottom: "fc7_p"
-  top: "fc7_p"
-}
-
-
-
-#Done
-layer {
-  name: "fc8_p"
-  type: "InnerProduct"
-  bottom: "fc7_p"
-  top: "fc8_p"
-  param {
-    name: "fc8_w"
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    name: "fc8_b"
-    lr_mult: 2
-    decay_mult: 0
-  }
-  inner_product_param {
-    num_output: 1000
+    num_output: 64
     weight_filler {
       type: "gaussian"
       std: 0.01
@@ -790,8 +640,8 @@ layer {
 layer{
    name: "siamese_accuracy"
    type: "SiameseAccuracy"
-   bottom: "fc8"
-   bottom: "fc8_p"
+   bottom: "fc"
+   bottom: "fc_p"
    bottom: "sim"
    top: "siamese_accuracy"
    include{
@@ -799,13 +649,12 @@ layer{
    }
 }
 
-
 # this is contrastive loss layer 
 layer {
   name: "loss"
   type: "ContrastiveLoss"
-  bottom: "fc8"
-  bottom: "fc8_p"
+  bottom: "fc"
+  bottom: "fc_p"
   bottom: "sim"
   top: "loss"
   contrastive_loss_param {
