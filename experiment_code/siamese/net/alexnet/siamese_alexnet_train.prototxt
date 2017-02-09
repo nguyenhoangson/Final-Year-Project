@@ -1,4 +1,5 @@
 name: "SiameseAlexNet"
+
 ### siamese data layer
 layer {
   name: "pair_data"
@@ -312,24 +313,68 @@ layer {
   }
 }
 
-#Done
+
 layer {
-  name: "fc"
+  name: "fc6_new"
   type: "InnerProduct"
   bottom: "pool5"
-  top: "fc"
+  top: "fc6_new"
   param {
-    name: "fc_w"
+  	name: "fc6_new_w"
     lr_mult: 1
     decay_mult: 1
   }
   param {
-    name: "fc_b"
+  	name: "fc6_new_b"
     lr_mult: 2
     decay_mult: 0
   }
   inner_product_param {
     num_output: 64
+    weight_filler {
+      type: "gaussian"
+      std: 0.005
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.1
+    }
+  }
+}
+layer {
+  name: "relu6_new"
+  type: "ReLU"
+  bottom: "fc6_new"
+  top: "fc6_new"
+}
+layer {
+  name: "drop6_new"
+  type: "Dropout"
+  bottom: "fc6_new"
+  top: "fc6_new"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+
+#Done
+layer {
+  name: "fc7_new"
+  type: "InnerProduct"
+  bottom: "fc6_new"
+  top: "fc7_new"
+  param {
+    name: "fc7_new_w"
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    name: "fc7_new_b"
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 16
     weight_filler {
       type: "gaussian"
       std: 0.01
@@ -340,6 +385,7 @@ layer {
     }
   }
 }
+
 
 
 ### Net for Image 2 
@@ -608,24 +654,67 @@ layer {
 }
 
 
-#Done
 layer {
-  name: "fc_p"
+  name: "fc6_new_p"
   type: "InnerProduct"
   bottom: "pool5_p"
-  top: "fc_p"
+  top: "fc6_new_p"
   param {
-    name: "fc_w"
+  	name: "fc6_new_w"
     lr_mult: 1
     decay_mult: 1
   }
   param {
-    name: "fc_b"
+  	name: "fc6_new_b"
     lr_mult: 2
     decay_mult: 0
   }
   inner_product_param {
     num_output: 64
+    weight_filler {
+      type: "gaussian"
+      std: 0.005
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.1
+    }
+  }
+}
+layer {
+  name: "relu6_new_p"
+  type: "ReLU"
+  bottom: "fc6_new_p"
+  top: "fc6_new_p"
+}
+layer {
+  name: "drop6_new_p"
+  type: "Dropout"
+  bottom: "fc6_new_p"
+  top: "fc6_new_p"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+
+#Done
+layer {
+  name: "fc7_new_p"
+  type: "InnerProduct"
+  bottom: "fc6_new_p"
+  top: "fc7_new_p"
+  param {
+    name: "fc7_new_w"
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    name: "fc7_new_b"
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 16
     weight_filler {
       type: "gaussian"
       std: 0.01
@@ -640,8 +729,8 @@ layer {
 layer{
    name: "siamese_accuracy"
    type: "SiameseAccuracy"
-   bottom: "fc"
-   bottom: "fc_p"
+   bottom: "fc7_new"
+   bottom: "fc7_new_p"
    bottom: "sim"
    top: "siamese_accuracy"
    include{
@@ -653,8 +742,8 @@ layer{
 layer {
   name: "loss"
   type: "ContrastiveLoss"
-  bottom: "fc"
-  bottom: "fc_p"
+  bottom: "fc7_new"
+  bottom: "fc7_new_p"
   bottom: "sim"
   top: "loss"
   contrastive_loss_param {
