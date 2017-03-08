@@ -747,6 +747,6 @@ layer {
   bottom: "sim"
   top: "loss"
   contrastive_loss_param {
-    margin: 0.5
+    margin: 1
   }
 }
