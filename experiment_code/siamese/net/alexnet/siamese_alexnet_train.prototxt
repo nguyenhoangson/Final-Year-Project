@@ -13,7 +13,8 @@ layer {
     scale: 0.00390625
   }
   data_param {
-    source: "/home/ubuntu/fyp/data/data-fyp/siamese_train_leveldb"
+    #source: "/home/ubuntu/fyp/data/data-fyp/siamese_train_leveldb"
+    source: "/home/nguyenhoangson/FYP/data/siamese_data_final/leveldb/siamese_train_leveldb"
     batch_size: 64
   }
 }
@@ -29,7 +30,8 @@ layer {
     scale: 0.00390625
   }
   data_param {
-    source: "/home/ubuntu/fyp/data/data-fyp/siamese_test_leveldb"
+    #source: "/home/ubuntu/fyp/data/data-fyp/siamese_test_leveldb"
+    source: "/home/nguyenhoangson/FYP/data/siamese_data_final/leveldb/siamese_test_leveldb"
     batch_size: 50
   }
 }
@@ -56,13 +58,13 @@ layer {
   top: "conv1"
   param {
     name: "conv1_w"
-    lr_mult: 1
+    lr_mult: 0 # Freeze the layer
     decay_mult: 1
   }
 
   param {
     name: "conv1_b"
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
 
@@ -123,12 +125,12 @@ layer {
   top: "conv2"
   param {
     name: "conv2_w"
-    lr_mult: 1
+    lr_mult: 0
     decay_mult: 1
   }
   param {
     name: "conv2_b"
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -189,12 +191,12 @@ layer {
   top: "conv3"
   param {
     name: "conv3_w"
-    lr_mult: 1
+    lr_mult: 0
     decay_mult: 1
   }
   param {
     name: "conv3_b"
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -228,12 +230,12 @@ layer {
   top: "conv4"
   param {
     name: "conv4_w"
-    lr_mult: 1
+    lr_mult: 0
     decay_mult: 1
   }
   param {
     name: "conv4_b" 
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -268,12 +270,12 @@ layer {
   top: "conv5"
   param {
     name: "conv5_w"
-    lr_mult: 1
+    lr_mult: 0
     decay_mult: 1
   }
   param {
     name: "conv5_b"
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -321,12 +323,12 @@ layer {
   top: "fc6"
   param {
   	name: "fc6_w"
-    lr_mult: 1
+    lr_mult: 0
     decay_mult: 1
   }
   param {
   	name: "fc6_b"
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   inner_product_param {
@@ -365,12 +367,12 @@ layer {
   top: "fc7"
   param {
     name: "fc7_w"
-    lr_mult: 1
+    lr_mult: 0
     decay_mult: 1
   }
   param {
     name: "fc7_b"
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   inner_product_param {
@@ -387,6 +389,34 @@ layer {
 }
 
 
+layer {
+  name: "fc8"
+  type: "InnerProduct"
+  bottom: "fc7"
+  top: "fc8"
+  param {
+    name: "fc8_w"
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    name: "fc8_b"
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 1000
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
 
 ### Net for Image 2 
 
@@ -398,12 +428,12 @@ layer {
   top: "conv1_p"
   param {
     name: "conv1_w"
-    lr_mult: 1
+    lr_mult: 0
     decay_mult: 1
   }
   param {
     name: "conv1_b"
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -463,12 +493,12 @@ layer {
   top: "conv2_p"
   param {
     name: "conv2_w"
-    lr_mult: 1
+    lr_mult: 0
     decay_mult: 1
   }
   param {
     name: "conv2_b"
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -529,12 +559,12 @@ layer {
   top: "conv3_p"
   param {
     name: "conv3_w"
-    lr_mult: 1
+    lr_mult: 0
     decay_mult: 1
   }
   param {
     name: "conv3_b"
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -568,12 +598,12 @@ layer {
   top: "conv4_p"
   param {
     name: "conv4_w"
-    lr_mult: 1
+    lr_mult: 0
     decay_mult: 1
   }
   param {
     name: "conv4_b" 
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -608,12 +638,12 @@ layer {
   top: "conv5_p"
   param {
     name: "conv5_w"
-    lr_mult: 1
+    lr_mult: 0
     decay_mult: 1
   }
   param {
     name: "conv5_b"
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -661,12 +691,12 @@ layer {
   top: "fc6_p"
   param {
   	name: "fc6_w"
-    lr_mult: 1
+    lr_mult: 0
     decay_mult: 1
   }
   param {
   	name: "fc6_b"
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   inner_product_param {
@@ -705,12 +735,12 @@ layer {
   top: "fc7_p"
   param {
     name: "fc7_w"
-    lr_mult: 1
+    lr_mult: 0
     decay_mult: 1
   }
   param {
     name: "fc7_b"
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   inner_product_param {
@@ -726,11 +756,41 @@ layer {
   }
 }
 
+
+layer {
+  name: "fc8_p"
+  type: "InnerProduct"
+  bottom: "fc7_p"
+  top: "fc8_p"
+  param {
+    name: "fc8_w"
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    name: "fc8_b"
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 1000
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+
 layer{
    name: "siamese_accuracy"
    type: "SiameseAccuracy"
-   bottom: "fc7"
-   bottom: "fc7_p"
+   bottom: "fc8"
+   bottom: "fc8_p"
    bottom: "sim"
    top: "siamese_accuracy"
    include{
@@ -742,8 +802,8 @@ layer{
 layer {
   name: "loss"
   type: "ContrastiveLoss"
-  bottom: "fc7"
-  bottom: "fc7_p"
+  bottom: "fc8"
+  bottom: "fc8_p"
   bottom: "sim"
   top: "loss"
   contrastive_loss_param {
