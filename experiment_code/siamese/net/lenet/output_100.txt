@@ -1,0 +1,1243 @@
+I0319 07:24:18.730607  6981 caffe.cpp:185] Using GPUs 0
+I0319 07:24:18.739653  6981 caffe.cpp:190] GPU 0: GRID K520
+I0319 07:24:18.900283  6981 solver.cpp:48] Initializing solver from parameters: 
+test_iter: 100
+test_interval: 500
+base_lr: 0.01
+display: 100
+max_iter: 50000
+lr_policy: "inv"
+gamma: 0.0001
+power: 0.75
+momentum: 0.9
+weight_decay: 0
+snapshot: 5000
+snapshot_prefix: "./mnist_siamese"
+solver_mode: GPU
+device_id: 0
+net: "./siamese_lenet_train.prototxt"
+I0319 07:24:18.900508  6981 solver.cpp:91] Creating training net from net file: ./siamese_lenet_train.prototxt
+I0319 07:24:18.901235  6981 net.cpp:313] The NetState phase (0) differed from the phase (1) specified by a rule in layer pair_data
+I0319 07:24:18.901275  6981 net.cpp:313] The NetState phase (0) differed from the phase (1) specified by a rule in layer siamese_accuracy
+I0319 07:24:18.901453  6981 net.cpp:49] Initializing net from parameters: 
+name: "mnist_siamese_train_test"
+state {
+  phase: TRAIN
+}
+layer {
+  name: "pair_data"
+  type: "Data"
+  top: "pair_data"
+  top: "sim"
+  include {
+    phase: TRAIN
+  }
+  transform_param {
+    scale: 0.00390625
+    crop_size: 32
+  }
+  data_param {
+    source: "/home/ubuntu/fyp/data/data-fyp/siamese_train_leveldb"
+    batch_size: 64
+  }
+}
+layer {
+  name: "slice_pair"
+  type: "Slice"
+  bottom: "pair_data"
+  top: "data"
+  top: "data_p"
+  slice_param {
+    slice_dim: 1
+    slice_point: 3
+  }
+}
+layer {
+  name: "conv1"
+  type: "Convolution"
+  bottom: "data"
+  top: "conv1"
+  param {
+    name: "conv1_w"
+    lr_mult: 1
+  }
+  param {
+    name: "conv1_b"
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 20
+    kernel_size: 5
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "pool1"
+  type: "Pooling"
+  bottom: "conv1"
+  top: "pool1"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "conv2"
+  type: "Convolution"
+  bottom: "pool1"
+  top: "conv2"
+  param {
+    name: "conv2_w"
+    lr_mult: 1
+  }
+  param {
+    name: "conv2_b"
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 50
+    kernel_size: 5
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "pool2"
+  type: "Pooling"
+  bottom: "conv2"
+  top: "pool2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "ip2"
+  type: "InnerProduct"
+  bottom: "pool2"
+  top: "ip2"
+  param {
+    name: "ip2_w"
+    lr_mult: 1
+  }
+  param {
+    name: "ip2_b"
+    lr_mult: 2
+  }
+  inner_product_param {
+    num_output: 10
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "feat"
+  type: "InnerProduct"
+  bottom: "ip2"
+  top: "feat"
+  param {
+    name: "feat_w"
+    lr_mult: 1
+  }
+  param {
+    name: "feat_b"
+    lr_mult: 2
+  }
+  inner_product_param {
+    num_output: 2
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "conv1_p"
+  type: "Convolution"
+  bottom: "data_p"
+  top: "conv1_p"
+  param {
+    name: "conv1_w"
+    lr_mult: 1
+  }
+  param {
+    name: "conv1_b"
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 20
+    kernel_size: 5
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "pool1_p"
+  type: "Pooling"
+  bottom: "conv1_p"
+  top: "pool1_p"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "conv2_p"
+  type: "Convolution"
+  bottom: "pool1_p"
+  top: "conv2_p"
+  param {
+    name: "conv2_w"
+    lr_mult: 1
+  }
+  param {
+    name: "conv2_b"
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 50
+    kernel_size: 5
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "pool2_p"
+  type: "Pooling"
+  bottom: "conv2_p"
+  top: "pool2_p"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "ip2_p"
+  type: "InnerProduct"
+  bottom: "pool2_p"
+  top: "ip2_p"
+  param {
+    name: "ip2_w"
+    lr_mult: 1
+  }
+  param {
+    name: "ip2_b"
+    lr_mult: 2
+  }
+  inner_product_param {
+    num_output: 10
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "feat_p"
+  type: "InnerProduct"
+  bottom: "ip2_p"
+  top: "feat_p"
+  param {
+    name: "feat_w"
+    lr_mult: 1
+  }
+  param {
+    name: "feat_b"
+    lr_mult: 2
+  }
+  inner_product_param {
+    num_output: 2
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "loss"
+  type: "ContrastiveLoss"
+  bottom: "feat"
+  bottom: "feat_p"
+  bottom: "sim"
+  top: "loss"
+  contrastive_loss_param {
+    margin: 100
+  }
+}
+I0319 07:24:18.901619  6981 layer_factory.hpp:77] Creating layer pair_data
+I0319 07:24:18.902140  6981 net.cpp:91] Creating Layer pair_data
+I0319 07:24:18.902168  6981 net.cpp:399] pair_data -> pair_data
+I0319 07:24:18.902254  6981 net.cpp:399] pair_data -> sim
+I0319 07:24:18.911108  6985 db_leveldb.cpp:18] Opened leveldb /home/ubuntu/fyp/data/data-fyp/siamese_train_leveldb
+I0319 07:24:18.928783  6981 data_layer.cpp:41] output data size: 64,6,32,32
+I0319 07:24:18.932467  6981 net.cpp:141] Setting up pair_data
+I0319 07:24:18.932543  6981 net.cpp:148] Top shape: 64 6 32 32 (393216)
+I0319 07:24:18.932559  6981 net.cpp:148] Top shape: 64 (64)
+I0319 07:24:18.932564  6981 net.cpp:156] Memory required for data: 1573120
+I0319 07:24:18.932581  6981 layer_factory.hpp:77] Creating layer slice_pair
+I0319 07:24:18.932603  6981 net.cpp:91] Creating Layer slice_pair
+I0319 07:24:18.932612  6981 net.cpp:425] slice_pair <- pair_data
+I0319 07:24:18.932631  6981 net.cpp:399] slice_pair -> data
+I0319 07:24:18.932648  6981 net.cpp:399] slice_pair -> data_p
+I0319 07:24:18.932740  6981 net.cpp:141] Setting up slice_pair
+I0319 07:24:18.932756  6981 net.cpp:148] Top shape: 64 3 32 32 (196608)
+I0319 07:24:18.932763  6981 net.cpp:148] Top shape: 64 3 32 32 (196608)
+I0319 07:24:18.932768  6981 net.cpp:156] Memory required for data: 3145984
+I0319 07:24:18.932773  6981 layer_factory.hpp:77] Creating layer conv1
+I0319 07:24:18.932807  6981 net.cpp:91] Creating Layer conv1
+I0319 07:24:18.932813  6981 net.cpp:425] conv1 <- data
+I0319 07:24:18.932824  6981 net.cpp:399] conv1 -> conv1
+I0319 07:24:18.934623  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:19.135069  6981 net.cpp:141] Setting up conv1
+I0319 07:24:19.135120  6981 net.cpp:148] Top shape: 64 20 28 28 (1003520)
+I0319 07:24:19.135129  6981 net.cpp:156] Memory required for data: 7160064
+I0319 07:24:19.135159  6981 layer_factory.hpp:77] Creating layer pool1
+I0319 07:24:19.135179  6981 net.cpp:91] Creating Layer pool1
+I0319 07:24:19.135190  6981 net.cpp:425] pool1 <- conv1
+I0319 07:24:19.135200  6981 net.cpp:399] pool1 -> pool1
+I0319 07:24:19.135284  6981 net.cpp:141] Setting up pool1
+I0319 07:24:19.135303  6981 net.cpp:148] Top shape: 64 20 14 14 (250880)
+I0319 07:24:19.135309  6981 net.cpp:156] Memory required for data: 8163584
+I0319 07:24:19.135314  6981 layer_factory.hpp:77] Creating layer conv2
+I0319 07:24:19.135335  6981 net.cpp:91] Creating Layer conv2
+I0319 07:24:19.135342  6981 net.cpp:425] conv2 <- pool1
+I0319 07:24:19.135351  6981 net.cpp:399] conv2 -> conv2
+I0319 07:24:19.136896  6981 net.cpp:141] Setting up conv2
+I0319 07:24:19.136920  6981 net.cpp:148] Top shape: 64 50 10 10 (320000)
+I0319 07:24:19.136926  6981 net.cpp:156] Memory required for data: 9443584
+I0319 07:24:19.136939  6981 layer_factory.hpp:77] Creating layer pool2
+I0319 07:24:19.136955  6981 net.cpp:91] Creating Layer pool2
+I0319 07:24:19.136965  6981 net.cpp:425] pool2 <- conv2
+I0319 07:24:19.136971  6981 net.cpp:399] pool2 -> pool2
+I0319 07:24:19.137017  6981 net.cpp:141] Setting up pool2
+I0319 07:24:19.137034  6981 net.cpp:148] Top shape: 64 50 5 5 (80000)
+I0319 07:24:19.137039  6981 net.cpp:156] Memory required for data: 9763584
+I0319 07:24:19.137044  6981 layer_factory.hpp:77] Creating layer ip2
+I0319 07:24:19.137059  6981 net.cpp:91] Creating Layer ip2
+I0319 07:24:19.137065  6981 net.cpp:425] ip2 <- pool2
+I0319 07:24:19.137073  6981 net.cpp:399] ip2 -> ip2
+I0319 07:24:19.137804  6981 net.cpp:141] Setting up ip2
+I0319 07:24:19.137825  6981 net.cpp:148] Top shape: 64 10 (640)
+I0319 07:24:19.137831  6981 net.cpp:156] Memory required for data: 9766144
+I0319 07:24:19.137842  6981 layer_factory.hpp:77] Creating layer feat
+I0319 07:24:19.137852  6981 net.cpp:91] Creating Layer feat
+I0319 07:24:19.137858  6981 net.cpp:425] feat <- ip2
+I0319 07:24:19.137866  6981 net.cpp:399] feat -> feat
+I0319 07:24:19.137981  6981 net.cpp:141] Setting up feat
+I0319 07:24:19.137998  6981 net.cpp:148] Top shape: 64 2 (128)
+I0319 07:24:19.138005  6981 net.cpp:156] Memory required for data: 9766656
+I0319 07:24:19.138013  6981 layer_factory.hpp:77] Creating layer conv1_p
+I0319 07:24:19.138026  6981 net.cpp:91] Creating Layer conv1_p
+I0319 07:24:19.138032  6981 net.cpp:425] conv1_p <- data_p
+I0319 07:24:19.138041  6981 net.cpp:399] conv1_p -> conv1_p
+I0319 07:24:19.138811  6981 net.cpp:141] Setting up conv1_p
+I0319 07:24:19.138833  6981 net.cpp:148] Top shape: 64 20 28 28 (1003520)
+I0319 07:24:19.138839  6981 net.cpp:156] Memory required for data: 13780736
+I0319 07:24:19.138847  6981 net.cpp:484] Sharing parameters 'conv1_w' owned by layer 'conv1', param index 0
+I0319 07:24:19.138854  6981 net.cpp:484] Sharing parameters 'conv1_b' owned by layer 'conv1', param index 1
+I0319 07:24:19.138859  6981 layer_factory.hpp:77] Creating layer pool1_p
+I0319 07:24:19.138869  6981 net.cpp:91] Creating Layer pool1_p
+I0319 07:24:19.138873  6981 net.cpp:425] pool1_p <- conv1_p
+I0319 07:24:19.138883  6981 net.cpp:399] pool1_p -> pool1_p
+I0319 07:24:19.138947  6981 net.cpp:141] Setting up pool1_p
+I0319 07:24:19.138963  6981 net.cpp:148] Top shape: 64 20 14 14 (250880)
+I0319 07:24:19.138969  6981 net.cpp:156] Memory required for data: 14784256
+I0319 07:24:19.138974  6981 layer_factory.hpp:77] Creating layer conv2_p
+I0319 07:24:19.138989  6981 net.cpp:91] Creating Layer conv2_p
+I0319 07:24:19.138994  6981 net.cpp:425] conv2_p <- pool1_p
+I0319 07:24:19.139005  6981 net.cpp:399] conv2_p -> conv2_p
+I0319 07:24:19.140090  6981 net.cpp:141] Setting up conv2_p
+I0319 07:24:19.140113  6981 net.cpp:148] Top shape: 64 50 10 10 (320000)
+I0319 07:24:19.140118  6981 net.cpp:156] Memory required for data: 16064256
+I0319 07:24:19.140125  6981 net.cpp:484] Sharing parameters 'conv2_w' owned by layer 'conv2', param index 0
+I0319 07:24:19.140132  6981 net.cpp:484] Sharing parameters 'conv2_b' owned by layer 'conv2', param index 1
+I0319 07:24:19.140137  6981 layer_factory.hpp:77] Creating layer pool2_p
+I0319 07:24:19.140146  6981 net.cpp:91] Creating Layer pool2_p
+I0319 07:24:19.140151  6981 net.cpp:425] pool2_p <- conv2_p
+I0319 07:24:19.140158  6981 net.cpp:399] pool2_p -> pool2_p
+I0319 07:24:19.140206  6981 net.cpp:141] Setting up pool2_p
+I0319 07:24:19.140223  6981 net.cpp:148] Top shape: 64 50 5 5 (80000)
+I0319 07:24:19.140228  6981 net.cpp:156] Memory required for data: 16384256
+I0319 07:24:19.140233  6981 layer_factory.hpp:77] Creating layer ip2_p
+I0319 07:24:19.140246  6981 net.cpp:91] Creating Layer ip2_p
+I0319 07:24:19.140251  6981 net.cpp:425] ip2_p <- pool2_p
+I0319 07:24:19.140262  6981 net.cpp:399] ip2_p -> ip2_p
+I0319 07:24:19.140517  6981 net.cpp:141] Setting up ip2_p
+I0319 07:24:19.140539  6981 net.cpp:148] Top shape: 64 10 (640)
+I0319 07:24:19.140544  6981 net.cpp:156] Memory required for data: 16386816
+I0319 07:24:19.140550  6981 net.cpp:484] Sharing parameters 'ip2_w' owned by layer 'ip2', param index 0
+I0319 07:24:19.140558  6981 net.cpp:484] Sharing parameters 'ip2_b' owned by layer 'ip2', param index 1
+I0319 07:24:19.140563  6981 layer_factory.hpp:77] Creating layer feat_p
+I0319 07:24:19.140571  6981 net.cpp:91] Creating Layer feat_p
+I0319 07:24:19.140578  6981 net.cpp:425] feat_p <- ip2_p
+I0319 07:24:19.140588  6981 net.cpp:399] feat_p -> feat_p
+I0319 07:24:19.140694  6981 net.cpp:141] Setting up feat_p
+I0319 07:24:19.140712  6981 net.cpp:148] Top shape: 64 2 (128)
+I0319 07:24:19.140717  6981 net.cpp:156] Memory required for data: 16387328
+I0319 07:24:19.140722  6981 net.cpp:484] Sharing parameters 'feat_w' owned by layer 'feat', param index 0
+I0319 07:24:19.140743  6981 net.cpp:484] Sharing parameters 'feat_b' owned by layer 'feat', param index 1
+I0319 07:24:19.140748  6981 layer_factory.hpp:77] Creating layer loss
+I0319 07:24:19.140763  6981 net.cpp:91] Creating Layer loss
+I0319 07:24:19.140770  6981 net.cpp:425] loss <- feat
+I0319 07:24:19.140777  6981 net.cpp:425] loss <- feat_p
+I0319 07:24:19.140782  6981 net.cpp:425] loss <- sim
+I0319 07:24:19.140792  6981 net.cpp:399] loss -> loss
+I0319 07:24:19.140902  6981 net.cpp:141] Setting up loss
+I0319 07:24:19.140919  6981 net.cpp:148] Top shape: (1)
+I0319 07:24:19.140933  6981 net.cpp:151]     with loss weight 1
+I0319 07:24:19.140969  6981 net.cpp:156] Memory required for data: 16387332
+I0319 07:24:19.140975  6981 net.cpp:217] loss needs backward computation.
+I0319 07:24:19.140981  6981 net.cpp:217] feat_p needs backward computation.
+I0319 07:24:19.140986  6981 net.cpp:217] ip2_p needs backward computation.
+I0319 07:24:19.140991  6981 net.cpp:217] pool2_p needs backward computation.
+I0319 07:24:19.140995  6981 net.cpp:217] conv2_p needs backward computation.
+I0319 07:24:19.141000  6981 net.cpp:217] pool1_p needs backward computation.
+I0319 07:24:19.141005  6981 net.cpp:217] conv1_p needs backward computation.
+I0319 07:24:19.141010  6981 net.cpp:217] feat needs backward computation.
+I0319 07:24:19.141014  6981 net.cpp:217] ip2 needs backward computation.
+I0319 07:24:19.141019  6981 net.cpp:217] pool2 needs backward computation.
+I0319 07:24:19.141024  6981 net.cpp:217] conv2 needs backward computation.
+I0319 07:24:19.141028  6981 net.cpp:217] pool1 needs backward computation.
+I0319 07:24:19.141033  6981 net.cpp:217] conv1 needs backward computation.
+I0319 07:24:19.141038  6981 net.cpp:219] slice_pair does not need backward computation.
+I0319 07:24:19.141044  6981 net.cpp:219] pair_data does not need backward computation.
+I0319 07:24:19.141048  6981 net.cpp:261] This network produces output loss
+I0319 07:24:19.141170  6981 net.cpp:274] Network initialization done.
+I0319 07:24:19.141892  6981 solver.cpp:181] Creating test net (#0) specified by net file: ./siamese_lenet_train.prototxt
+I0319 07:24:19.141950  6981 net.cpp:313] The NetState phase (1) differed from the phase (0) specified by a rule in layer pair_data
+I0319 07:24:19.142138  6981 net.cpp:49] Initializing net from parameters: 
+name: "mnist_siamese_train_test"
+state {
+  phase: TEST
+}
+layer {
+  name: "pair_data"
+  type: "Data"
+  top: "pair_data"
+  top: "sim"
+  include {
+    phase: TEST
+  }
+  transform_param {
+    scale: 0.00390625
+    crop_size: 32
+  }
+  data_param {
+    source: "/home/ubuntu/fyp/data/data-fyp/siamese_test_leveldb"
+    batch_size: 100
+  }
+}
+layer {
+  name: "slice_pair"
+  type: "Slice"
+  bottom: "pair_data"
+  top: "data"
+  top: "data_p"
+  slice_param {
+    slice_dim: 1
+    slice_point: 3
+  }
+}
+layer {
+  name: "conv1"
+  type: "Convolution"
+  bottom: "data"
+  top: "conv1"
+  param {
+    name: "conv1_w"
+    lr_mult: 1
+  }
+  param {
+    name: "conv1_b"
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 20
+    kernel_size: 5
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "pool1"
+  type: "Pooling"
+  bottom: "conv1"
+  top: "pool1"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "conv2"
+  type: "Convolution"
+  bottom: "pool1"
+  top: "conv2"
+  param {
+    name: "conv2_w"
+    lr_mult: 1
+  }
+  param {
+    name: "conv2_b"
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 50
+    kernel_size: 5
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "pool2"
+  type: "Pooling"
+  bottom: "conv2"
+  top: "pool2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "ip2"
+  type: "InnerProduct"
+  bottom: "pool2"
+  top: "ip2"
+  param {
+    name: "ip2_w"
+    lr_mult: 1
+  }
+  param {
+    name: "ip2_b"
+    lr_mult: 2
+  }
+  inner_product_param {
+    num_output: 10
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "feat"
+  type: "InnerProduct"
+  bottom: "ip2"
+  top: "feat"
+  param {
+    name: "feat_w"
+    lr_mult: 1
+  }
+  param {
+    name: "feat_b"
+    lr_mult: 2
+  }
+  inner_product_param {
+    num_output: 2
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "conv1_p"
+  type: "Convolution"
+  bottom: "data_p"
+  top: "conv1_p"
+  param {
+    name: "conv1_w"
+    lr_mult: 1
+  }
+  param {
+    name: "conv1_b"
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 20
+    kernel_size: 5
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "pool1_p"
+  type: "Pooling"
+  bottom: "conv1_p"
+  top: "pool1_p"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "conv2_p"
+  type: "Convolution"
+  bottom: "pool1_p"
+  top: "conv2_p"
+  param {
+    name: "conv2_w"
+    lr_mult: 1
+  }
+  param {
+    name: "conv2_b"
+    lr_mult: 2
+  }
+  convolution_param {
+    num_output: 50
+    kernel_size: 5
+    stride: 1
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "pool2_p"
+  type: "Pooling"
+  bottom: "conv2_p"
+  top: "pool2_p"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "ip2_p"
+  type: "InnerProduct"
+  bottom: "pool2_p"
+  top: "ip2_p"
+  param {
+    name: "ip2_w"
+    lr_mult: 1
+  }
+  param {
+    name: "ip2_b"
+    lr_mult: 2
+  }
+  inner_product_param {
+    num_output: 10
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "feat_p"
+  type: "InnerProduct"
+  bottom: "ip2_p"
+  top: "feat_p"
+  param {
+    name: "feat_w"
+    lr_mult: 1
+  }
+  param {
+    name: "feat_b"
+    lr_mult: 2
+  }
+  inner_product_param {
+    num_output: 2
+    weight_filler {
+      type: "xavier"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "siamese_accuracy"
+  type: "SiameseAccuracy"
+  bottom: "feat"
+  bottom: "feat_p"
+  bottom: "sim"
+  top: "siamese_accuracy"
+  include {
+    phase: TEST
+  }
+}
+layer {
+  name: "loss"
+  type: "ContrastiveLoss"
+  bottom: "feat"
+  bottom: "feat_p"
+  bottom: "sim"
+  top: "loss"
+  contrastive_loss_param {
+    margin: 100
+  }
+}
+I0319 07:24:19.142285  6981 layer_factory.hpp:77] Creating layer pair_data
+I0319 07:24:19.142459  6981 net.cpp:91] Creating Layer pair_data
+I0319 07:24:19.142472  6981 net.cpp:399] pair_data -> pair_data
+I0319 07:24:19.142487  6981 net.cpp:399] pair_data -> sim
+I0319 07:24:19.150349  6987 db_leveldb.cpp:18] Opened leveldb /home/ubuntu/fyp/data/data-fyp/siamese_test_leveldb
+I0319 07:24:19.152607  6981 data_layer.cpp:41] output data size: 100,6,32,32
+I0319 07:24:19.158231  6981 net.cpp:141] Setting up pair_data
+I0319 07:24:19.158272  6981 net.cpp:148] Top shape: 100 6 32 32 (614400)
+I0319 07:24:19.158280  6981 net.cpp:148] Top shape: 100 (100)
+I0319 07:24:19.158287  6981 net.cpp:156] Memory required for data: 2458000
+I0319 07:24:19.158295  6981 layer_factory.hpp:77] Creating layer sim_pair_data_1_split
+I0319 07:24:19.158319  6981 net.cpp:91] Creating Layer sim_pair_data_1_split
+I0319 07:24:19.158326  6981 net.cpp:425] sim_pair_data_1_split <- sim
+I0319 07:24:19.158336  6981 net.cpp:399] sim_pair_data_1_split -> sim_pair_data_1_split_0
+I0319 07:24:19.158354  6981 net.cpp:399] sim_pair_data_1_split -> sim_pair_data_1_split_1
+I0319 07:24:19.158521  6981 net.cpp:141] Setting up sim_pair_data_1_split
+I0319 07:24:19.158538  6981 net.cpp:148] Top shape: 100 (100)
+I0319 07:24:19.158545  6981 net.cpp:148] Top shape: 100 (100)
+I0319 07:24:19.158550  6981 net.cpp:156] Memory required for data: 2458800
+I0319 07:24:19.158556  6981 layer_factory.hpp:77] Creating layer slice_pair
+I0319 07:24:19.158571  6981 net.cpp:91] Creating Layer slice_pair
+I0319 07:24:19.158576  6981 net.cpp:425] slice_pair <- pair_data
+I0319 07:24:19.158583  6981 net.cpp:399] slice_pair -> data
+I0319 07:24:19.158594  6981 net.cpp:399] slice_pair -> data_p
+I0319 07:24:19.158756  6981 net.cpp:141] Setting up slice_pair
+I0319 07:24:19.158776  6981 net.cpp:148] Top shape: 100 3 32 32 (307200)
+I0319 07:24:19.158782  6981 net.cpp:148] Top shape: 100 3 32 32 (307200)
+I0319 07:24:19.158787  6981 net.cpp:156] Memory required for data: 4916400
+I0319 07:24:19.158792  6981 layer_factory.hpp:77] Creating layer conv1
+I0319 07:24:19.158813  6981 net.cpp:91] Creating Layer conv1
+I0319 07:24:19.158819  6981 net.cpp:425] conv1 <- data
+I0319 07:24:19.158830  6981 net.cpp:399] conv1 -> conv1
+I0319 07:24:19.160462  6981 net.cpp:141] Setting up conv1
+I0319 07:24:19.160486  6981 net.cpp:148] Top shape: 100 20 28 28 (1568000)
+I0319 07:24:19.160492  6981 net.cpp:156] Memory required for data: 11188400
+I0319 07:24:19.160507  6981 layer_factory.hpp:77] Creating layer pool1
+I0319 07:24:19.160521  6981 net.cpp:91] Creating Layer pool1
+I0319 07:24:19.160526  6981 net.cpp:425] pool1 <- conv1
+I0319 07:24:19.160533  6981 net.cpp:399] pool1 -> pool1
+I0319 07:24:19.160588  6981 net.cpp:141] Setting up pool1
+I0319 07:24:19.160605  6981 net.cpp:148] Top shape: 100 20 14 14 (392000)
+I0319 07:24:19.160617  6981 net.cpp:156] Memory required for data: 12756400
+I0319 07:24:19.160624  6981 layer_factory.hpp:77] Creating layer conv2
+I0319 07:24:19.160687  6981 net.cpp:91] Creating Layer conv2
+I0319 07:24:19.160702  6981 net.cpp:425] conv2 <- pool1
+I0319 07:24:19.160717  6981 net.cpp:399] conv2 -> conv2
+I0319 07:24:19.162066  6981 net.cpp:141] Setting up conv2
+I0319 07:24:19.162091  6981 net.cpp:148] Top shape: 100 50 10 10 (500000)
+I0319 07:24:19.162096  6981 net.cpp:156] Memory required for data: 14756400
+I0319 07:24:19.162107  6981 layer_factory.hpp:77] Creating layer pool2
+I0319 07:24:19.162118  6981 net.cpp:91] Creating Layer pool2
+I0319 07:24:19.162124  6981 net.cpp:425] pool2 <- conv2
+I0319 07:24:19.162133  6981 net.cpp:399] pool2 -> pool2
+I0319 07:24:19.162184  6981 net.cpp:141] Setting up pool2
+I0319 07:24:19.162201  6981 net.cpp:148] Top shape: 100 50 5 5 (125000)
+I0319 07:24:19.162206  6981 net.cpp:156] Memory required for data: 15256400
+I0319 07:24:19.162211  6981 layer_factory.hpp:77] Creating layer ip2
+I0319 07:24:19.162225  6981 net.cpp:91] Creating Layer ip2
+I0319 07:24:19.162230  6981 net.cpp:425] ip2 <- pool2
+I0319 07:24:19.162238  6981 net.cpp:399] ip2 -> ip2
+I0319 07:24:19.162457  6981 net.cpp:141] Setting up ip2
+I0319 07:24:19.162475  6981 net.cpp:148] Top shape: 100 10 (1000)
+I0319 07:24:19.162480  6981 net.cpp:156] Memory required for data: 15260400
+I0319 07:24:19.162490  6981 layer_factory.hpp:77] Creating layer feat
+I0319 07:24:19.162506  6981 net.cpp:91] Creating Layer feat
+I0319 07:24:19.162511  6981 net.cpp:425] feat <- ip2
+I0319 07:24:19.162521  6981 net.cpp:399] feat -> feat
+I0319 07:24:19.162629  6981 net.cpp:141] Setting up feat
+I0319 07:24:19.162647  6981 net.cpp:148] Top shape: 100 2 (200)
+I0319 07:24:19.162652  6981 net.cpp:156] Memory required for data: 15261200
+I0319 07:24:19.162659  6981 layer_factory.hpp:77] Creating layer feat_feat_0_split
+I0319 07:24:19.162667  6981 net.cpp:91] Creating Layer feat_feat_0_split
+I0319 07:24:19.162672  6981 net.cpp:425] feat_feat_0_split <- feat
+I0319 07:24:19.162678  6981 net.cpp:399] feat_feat_0_split -> feat_feat_0_split_0
+I0319 07:24:19.162689  6981 net.cpp:399] feat_feat_0_split -> feat_feat_0_split_1
+I0319 07:24:19.162734  6981 net.cpp:141] Setting up feat_feat_0_split
+I0319 07:24:19.162750  6981 net.cpp:148] Top shape: 100 2 (200)
+I0319 07:24:19.162755  6981 net.cpp:148] Top shape: 100 2 (200)
+I0319 07:24:19.162760  6981 net.cpp:156] Memory required for data: 15262800
+I0319 07:24:19.162765  6981 layer_factory.hpp:77] Creating layer conv1_p
+I0319 07:24:19.162781  6981 net.cpp:91] Creating Layer conv1_p
+I0319 07:24:19.162787  6981 net.cpp:425] conv1_p <- data_p
+I0319 07:24:19.162796  6981 net.cpp:399] conv1_p -> conv1_p
+I0319 07:24:19.163766  6981 net.cpp:141] Setting up conv1_p
+I0319 07:24:19.163789  6981 net.cpp:148] Top shape: 100 20 28 28 (1568000)
+I0319 07:24:19.163794  6981 net.cpp:156] Memory required for data: 21534800
+I0319 07:24:19.163817  6981 net.cpp:484] Sharing parameters 'conv1_w' owned by layer 'conv1', param index 0
+I0319 07:24:19.163825  6981 net.cpp:484] Sharing parameters 'conv1_b' owned by layer 'conv1', param index 1
+I0319 07:24:19.163830  6981 layer_factory.hpp:77] Creating layer pool1_p
+I0319 07:24:19.163838  6981 net.cpp:91] Creating Layer pool1_p
+I0319 07:24:19.163844  6981 net.cpp:425] pool1_p <- conv1_p
+I0319 07:24:19.163854  6981 net.cpp:399] pool1_p -> pool1_p
+I0319 07:24:19.163904  6981 net.cpp:141] Setting up pool1_p
+I0319 07:24:19.163923  6981 net.cpp:148] Top shape: 100 20 14 14 (392000)
+I0319 07:24:19.163928  6981 net.cpp:156] Memory required for data: 23102800
+I0319 07:24:19.163933  6981 layer_factory.hpp:77] Creating layer conv2_p
+I0319 07:24:19.163951  6981 net.cpp:91] Creating Layer conv2_p
+I0319 07:24:19.163957  6981 net.cpp:425] conv2_p <- pool1_p
+I0319 07:24:19.163965  6981 net.cpp:399] conv2_p -> conv2_p
+I0319 07:24:19.165067  6981 net.cpp:141] Setting up conv2_p
+I0319 07:24:19.165091  6981 net.cpp:148] Top shape: 100 50 10 10 (500000)
+I0319 07:24:19.165096  6981 net.cpp:156] Memory required for data: 25102800
+I0319 07:24:19.165102  6981 net.cpp:484] Sharing parameters 'conv2_w' owned by layer 'conv2', param index 0
+I0319 07:24:19.165108  6981 net.cpp:484] Sharing parameters 'conv2_b' owned by layer 'conv2', param index 1
+I0319 07:24:19.165113  6981 layer_factory.hpp:77] Creating layer pool2_p
+I0319 07:24:19.165122  6981 net.cpp:91] Creating Layer pool2_p
+I0319 07:24:19.165127  6981 net.cpp:425] pool2_p <- conv2_p
+I0319 07:24:19.165138  6981 net.cpp:399] pool2_p -> pool2_p
+I0319 07:24:19.165191  6981 net.cpp:141] Setting up pool2_p
+I0319 07:24:19.165208  6981 net.cpp:148] Top shape: 100 50 5 5 (125000)
+I0319 07:24:19.165215  6981 net.cpp:156] Memory required for data: 25602800
+I0319 07:24:19.165220  6981 layer_factory.hpp:77] Creating layer ip2_p
+I0319 07:24:19.165235  6981 net.cpp:91] Creating Layer ip2_p
+I0319 07:24:19.165241  6981 net.cpp:425] ip2_p <- pool2_p
+I0319 07:24:19.165251  6981 net.cpp:399] ip2_p -> ip2_p
+I0319 07:24:19.165465  6981 net.cpp:141] Setting up ip2_p
+I0319 07:24:19.165483  6981 net.cpp:148] Top shape: 100 10 (1000)
+I0319 07:24:19.165488  6981 net.cpp:156] Memory required for data: 25606800
+I0319 07:24:19.165494  6981 net.cpp:484] Sharing parameters 'ip2_w' owned by layer 'ip2', param index 0
+I0319 07:24:19.165500  6981 net.cpp:484] Sharing parameters 'ip2_b' owned by layer 'ip2', param index 1
+I0319 07:24:19.165505  6981 layer_factory.hpp:77] Creating layer feat_p
+I0319 07:24:19.165515  6981 net.cpp:91] Creating Layer feat_p
+I0319 07:24:19.165520  6981 net.cpp:425] feat_p <- ip2_p
+I0319 07:24:19.165531  6981 net.cpp:399] feat_p -> feat_p
+I0319 07:24:19.165681  6981 net.cpp:141] Setting up feat_p
+I0319 07:24:19.165700  6981 net.cpp:148] Top shape: 100 2 (200)
+I0319 07:24:19.165706  6981 net.cpp:156] Memory required for data: 25607600
+I0319 07:24:19.165712  6981 net.cpp:484] Sharing parameters 'feat_w' owned by layer 'feat', param index 0
+I0319 07:24:19.165719  6981 net.cpp:484] Sharing parameters 'feat_b' owned by layer 'feat', param index 1
+I0319 07:24:19.165724  6981 layer_factory.hpp:77] Creating layer feat_p_feat_p_0_split
+I0319 07:24:19.165735  6981 net.cpp:91] Creating Layer feat_p_feat_p_0_split
+I0319 07:24:19.165740  6981 net.cpp:425] feat_p_feat_p_0_split <- feat_p
+I0319 07:24:19.165746  6981 net.cpp:399] feat_p_feat_p_0_split -> feat_p_feat_p_0_split_0
+I0319 07:24:19.165755  6981 net.cpp:399] feat_p_feat_p_0_split -> feat_p_feat_p_0_split_1
+I0319 07:24:19.165803  6981 net.cpp:141] Setting up feat_p_feat_p_0_split
+I0319 07:24:19.165822  6981 net.cpp:148] Top shape: 100 2 (200)
+I0319 07:24:19.165828  6981 net.cpp:148] Top shape: 100 2 (200)
+I0319 07:24:19.165834  6981 net.cpp:156] Memory required for data: 25609200
+I0319 07:24:19.165839  6981 layer_factory.hpp:77] Creating layer siamese_accuracy
+I0319 07:24:19.165851  6981 net.cpp:91] Creating Layer siamese_accuracy
+I0319 07:24:19.165858  6981 net.cpp:425] siamese_accuracy <- feat_feat_0_split_0
+I0319 07:24:19.165877  6981 net.cpp:425] siamese_accuracy <- feat_p_feat_p_0_split_0
+I0319 07:24:19.165884  6981 net.cpp:425] siamese_accuracy <- sim_pair_data_1_split_0
+I0319 07:24:19.165891  6981 net.cpp:399] siamese_accuracy -> siamese_accuracy
+I0319 07:24:19.165989  6981 net.cpp:141] Setting up siamese_accuracy
+I0319 07:24:19.166007  6981 net.cpp:148] Top shape: (1)
+I0319 07:24:19.166014  6981 net.cpp:151]     with loss weight 1
+I0319 07:24:19.166029  6981 net.cpp:156] Memory required for data: 25609204
+I0319 07:24:19.166034  6981 layer_factory.hpp:77] Creating layer loss
+I0319 07:24:19.166044  6981 net.cpp:91] Creating Layer loss
+I0319 07:24:19.166049  6981 net.cpp:425] loss <- feat_feat_0_split_1
+I0319 07:24:19.166056  6981 net.cpp:425] loss <- feat_p_feat_p_0_split_1
+I0319 07:24:19.166062  6981 net.cpp:425] loss <- sim_pair_data_1_split_1
+I0319 07:24:19.166072  6981 net.cpp:399] loss -> loss
+I0319 07:24:19.166180  6981 net.cpp:141] Setting up loss
+I0319 07:24:19.166196  6981 net.cpp:148] Top shape: (1)
+I0319 07:24:19.166201  6981 net.cpp:151]     with loss weight 1
+I0319 07:24:19.166209  6981 net.cpp:156] Memory required for data: 25609208
+I0319 07:24:19.166214  6981 net.cpp:217] loss needs backward computation.
+I0319 07:24:19.166220  6981 net.cpp:217] siamese_accuracy needs backward computation.
+I0319 07:24:19.166226  6981 net.cpp:217] feat_p_feat_p_0_split needs backward computation.
+I0319 07:24:19.166231  6981 net.cpp:217] feat_p needs backward computation.
+I0319 07:24:19.166235  6981 net.cpp:217] ip2_p needs backward computation.
+I0319 07:24:19.166240  6981 net.cpp:217] pool2_p needs backward computation.
+I0319 07:24:19.166244  6981 net.cpp:217] conv2_p needs backward computation.
+I0319 07:24:19.166249  6981 net.cpp:217] pool1_p needs backward computation.
+I0319 07:24:19.166254  6981 net.cpp:217] conv1_p needs backward computation.
+I0319 07:24:19.166259  6981 net.cpp:217] feat_feat_0_split needs backward computation.
+I0319 07:24:19.166263  6981 net.cpp:217] feat needs backward computation.
+I0319 07:24:19.166268  6981 net.cpp:217] ip2 needs backward computation.
+I0319 07:24:19.166278  6981 net.cpp:217] pool2 needs backward computation.
+I0319 07:24:19.166283  6981 net.cpp:217] conv2 needs backward computation.
+I0319 07:24:19.166288  6981 net.cpp:217] pool1 needs backward computation.
+I0319 07:24:19.166292  6981 net.cpp:217] conv1 needs backward computation.
+I0319 07:24:19.166297  6981 net.cpp:219] slice_pair does not need backward computation.
+I0319 07:24:19.166303  6981 net.cpp:219] sim_pair_data_1_split does not need backward computation.
+I0319 07:24:19.166308  6981 net.cpp:219] pair_data does not need backward computation.
+I0319 07:24:19.166312  6981 net.cpp:261] This network produces output loss
+I0319 07:24:19.166317  6981 net.cpp:261] This network produces output siamese_accuracy
+I0319 07:24:19.166441  6981 net.cpp:274] Network initialization done.
+I0319 07:24:19.166582  6981 solver.cpp:60] Solver scaffolding done.
+I0319 07:24:19.166913  6981 caffe.cpp:219] Starting Optimization
+I0319 07:24:19.166931  6981 solver.cpp:279] Solving mnist_siamese_train_test
+I0319 07:24:19.166937  6981 solver.cpp:280] Learning Rate Policy: inv
+I0319 07:24:19.167271  6981 solver.cpp:337] Iteration 0, Testing net (#0)
+I0319 07:24:19.167403  6981 blocking_queue.cpp:50] Data layer prefetch queue empty
+I0319 07:24:19.627285  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:20.150280  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:20.672902  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:21.195576  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:21.718346  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:22.243296  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:22.767400  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:23.291127  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:23.822670  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:24.351692  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:24.379160  6981 solver.cpp:404]     Test net output #0: loss = 4476.83 (* 1 = 4476.83 loss)
+I0319 07:24:24.379246  6981 solver.cpp:404]     Test net output #1: siamese_accuracy = 0.2692 (* 1 = 0.2692 loss)
+I0319 07:24:24.386499  6981 solver.cpp:228] Iteration 0, loss = 4251.9
+I0319 07:24:24.386567  6981 solver.cpp:244]     Train net output #0: loss = 4251.9 (* 1 = 4251.9 loss)
+I0319 07:24:24.386601  6981 sgd_solver.cpp:106] Iteration 0, lr = 0.01
+I0319 07:24:24.795224  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:25.292184  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:25.802275  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:26.303092  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:26.801043  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:27.295347  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:27.376111  6981 solver.cpp:228] Iteration 100, loss = nan
+I0319 07:24:27.376176  6981 solver.cpp:244]     Train net output #0: loss = nan (* 1 = nan loss)
+I0319 07:24:27.376190  6981 sgd_solver.cpp:106] Iteration 100, lr = 0.00992565
+I0319 07:24:27.777873  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:28.251808  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:28.738803  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:29.242640  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:29.728291  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:30.230226  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:30.461324  6981 solver.cpp:228] Iteration 200, loss = nan
+I0319 07:24:30.461390  6981 solver.cpp:244]     Train net output #0: loss = nan (* 1 = nan loss)
+I0319 07:24:30.461405  6981 sgd_solver.cpp:106] Iteration 200, lr = 0.00985258
+I0319 07:24:30.731758  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:31.237809  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:31.716464  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:32.204005  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:32.696745  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:33.210886  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:33.582334  6981 solver.cpp:228] Iteration 300, loss = nan
+I0319 07:24:33.582399  6981 solver.cpp:244]     Train net output #0: loss = nan (* 1 = nan loss)
+I0319 07:24:33.582413  6981 sgd_solver.cpp:106] Iteration 300, lr = 0.00978075
+I0319 07:24:33.704761  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:34.199182  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:34.714331  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:35.229138  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:35.736922  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:36.221292  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:36.699805  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:36.730208  6981 solver.cpp:228] Iteration 400, loss = nan
+I0319 07:24:36.730275  6981 solver.cpp:244]     Train net output #0: loss = nan (* 1 = nan loss)
+I0319 07:24:36.730289  6981 sgd_solver.cpp:106] Iteration 400, lr = 0.00971013
+I0319 07:24:37.189308  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:37.698115  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:38.212880  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:38.711630  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:39.197235  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:39.695507  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:39.848141  6981 solver.cpp:337] Iteration 500, Testing net (#0)
+I0319 07:24:40.157331  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:40.681727  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:41.205503  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:41.728729  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:42.251917  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:42.775657  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:43.298858  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:43.822755  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:44.347169  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:44.687917  6981 solver.cpp:404]     Test net output #0: loss = nan (* 1 = nan loss)
+I0319 07:24:44.687963  6981 solver.cpp:404]     Test net output #1: siamese_accuracy = 0 (* 1 = 0 loss)
+I0319 07:24:44.692139  6981 solver.cpp:228] Iteration 500, loss = nan
+I0319 07:24:44.692190  6981 solver.cpp:244]     Train net output #0: loss = nan (* 1 = nan loss)
+I0319 07:24:44.692204  6981 sgd_solver.cpp:106] Iteration 500, lr = 0.00964069
+I0319 07:24:44.807435  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:45.255101  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:45.759636  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:46.245128  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:46.754729  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:47.260285  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:47.639046  6981 solver.cpp:228] Iteration 600, loss = nan
+I0319 07:24:47.639112  6981 solver.cpp:244]     Train net output #0: loss = nan (* 1 = nan loss)
+I0319 07:24:47.639127  6981 sgd_solver.cpp:106] Iteration 600, lr = 0.0095724
+I0319 07:24:47.762449  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:48.239447  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:48.748365  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:49.231266  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:49.730029  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:50.233768  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:50.725985  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:50.753021  6981 solver.cpp:228] Iteration 700, loss = nan
+I0319 07:24:50.753087  6981 solver.cpp:244]     Train net output #0: loss = nan (* 1 = nan loss)
+I0319 07:24:50.753100  6981 sgd_solver.cpp:106] Iteration 700, lr = 0.00950522
+I0319 07:24:51.217788  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:51.713091  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:52.208068  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:52.682785  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:53.186491  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:53.697806  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:53.872434  6981 solver.cpp:228] Iteration 800, loss = nan
+I0319 07:24:53.872503  6981 solver.cpp:244]     Train net output #0: loss = nan (* 1 = nan loss)
+I0319 07:24:53.872516  6981 sgd_solver.cpp:106] Iteration 800, lr = 0.00943913
+I0319 07:24:54.202527  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:54.640192  6981 blocking_queue.cpp:50] Data layer prefetch queue empty
+I0319 07:24:54.707958  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:55.208904  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:55.717057  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:56.215783  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:56.719588  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:57.031939  6981 solver.cpp:228] Iteration 900, loss = nan
+I0319 07:24:57.032003  6981 solver.cpp:244]     Train net output #0: loss = nan (* 1 = nan loss)
+I0319 07:24:57.032018  6981 sgd_solver.cpp:106] Iteration 900, lr = 0.00937411
+I0319 07:24:57.195276  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:57.692265  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:58.161084  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:58.669981  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:59.178828  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:24:59.651437  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:00.097950  6981 solver.cpp:337] Iteration 1000, Testing net (#0)
+I0319 07:25:00.143735  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:00.629778  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:01.157938  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:01.732002  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:02.269345  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:02.798166  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:03.325374  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:03.852306  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:04.379760  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:04.906249  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:05.027999  6981 solver.cpp:404]     Test net output #0: loss = nan (* 1 = nan loss)
+I0319 07:25:05.028046  6981 solver.cpp:404]     Test net output #1: siamese_accuracy = 0 (* 1 = 0 loss)
+I0319 07:25:05.032501  6981 solver.cpp:228] Iteration 1000, loss = nan
+I0319 07:25:05.032553  6981 solver.cpp:244]     Train net output #0: loss = nan (* 1 = nan loss)
+I0319 07:25:05.032567  6981 sgd_solver.cpp:106] Iteration 1000, lr = 0.00931012
+I0319 07:25:05.339411  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:05.851558  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:06.348834  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:06.825106  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:07.301319  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:07.799752  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:07.962296  6981 solver.cpp:228] Iteration 1100, loss = nan
+I0319 07:25:07.962360  6981 solver.cpp:244]     Train net output #0: loss = nan (* 1 = nan loss)
+I0319 07:25:07.962412  6981 sgd_solver.cpp:106] Iteration 1100, lr = 0.00924715
+I0319 07:25:08.301668  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:08.809114  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:09.308794  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:09.795835  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:10.292738  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:10.785904  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:11.074569  6981 solver.cpp:228] Iteration 1200, loss = nan
+I0319 07:25:11.074636  6981 solver.cpp:244]     Train net output #0: loss = nan (* 1 = nan loss)
+I0319 07:25:11.074651  6981 sgd_solver.cpp:106] Iteration 1200, lr = 0.00918515
+I0319 07:25:11.260030  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:11.747287  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:12.248215  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:12.738075  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:13.226115  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:13.724663  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:14.179114  6981 solver.cpp:228] Iteration 1300, loss = nan
+I0319 07:25:14.179180  6981 solver.cpp:244]     Train net output #0: loss = nan (* 1 = nan loss)
+I0319 07:25:14.179194  6981 sgd_solver.cpp:106] Iteration 1300, lr = 0.00912412
+I0319 07:25:14.219653  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:14.725872  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:15.214769  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:15.718189  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:16.207448  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:16.721223  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:17.232643  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:17.347301  6981 solver.cpp:228] Iteration 1400, loss = nan
+I0319 07:25:17.347367  6981 solver.cpp:244]     Train net output #0: loss = nan (* 1 = nan loss)
+I0319 07:25:17.347380  6981 sgd_solver.cpp:106] Iteration 1400, lr = 0.00906403
+I0319 07:25:17.724512  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:18.227795  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:18.722103  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:19.220578  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:19.713165  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:20.227643  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:20.449463  6981 solver.cpp:337] Iteration 1500, Testing net (#0)
+I0319 07:25:20.682876  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:21.212255  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:21.741586  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:22.270766  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:22.804530  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:23.331933  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:23.861804  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:24.392120  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:24.922636  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:25.350073  6981 solver.cpp:404]     Test net output #0: loss = nan (* 1 = nan loss)
+I0319 07:25:25.350118  6981 solver.cpp:404]     Test net output #1: siamese_accuracy = 0 (* 1 = 0 loss)
+I0319 07:25:25.354300  6981 solver.cpp:228] Iteration 1500, loss = nan
+I0319 07:25:25.354365  6981 solver.cpp:244]     Train net output #0: loss = nan (* 1 = nan loss)
+I0319 07:25:25.354387  6981 sgd_solver.cpp:106] Iteration 1500, lr = 0.00900485
+I0319 07:25:25.431076  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:25.859597  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:26.355547  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:26.857117  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:27.353701  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:27.845422  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:28.298775  6981 solver.cpp:228] Iteration 1600, loss = nan
+I0319 07:25:28.298840  6981 solver.cpp:244]     Train net output #0: loss = nan (* 1 = nan loss)
+I0319 07:25:28.298854  6981 sgd_solver.cpp:106] Iteration 1600, lr = 0.00894657
+I0319 07:25:28.345309  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:28.847216  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:29.348484  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:29.844842  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:30.060215  6981 blocking_queue.cpp:50] Data layer prefetch queue empty
+I0319 07:25:30.339648  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:30.835687  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:31.329989  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:31.437611  6981 solver.cpp:228] Iteration 1700, loss = nan
+I0319 07:25:31.437675  6981 solver.cpp:244]     Train net output #0: loss = nan (* 1 = nan loss)
+I0319 07:25:31.437690  6981 sgd_solver.cpp:106] Iteration 1700, lr = 0.00888916
+I0319 07:25:31.820611  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:32.317970  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:32.790380  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:33.290297  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:33.804738  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:34.297768  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:34.546921  6981 solver.cpp:228] Iteration 1800, loss = nan
+I0319 07:25:34.546984  6981 solver.cpp:244]     Train net output #0: loss = nan (* 1 = nan loss)
+I0319 07:25:34.546999  6981 sgd_solver.cpp:106] Iteration 1800, lr = 0.0088326
+I0319 07:25:34.780524  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:35.255830  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:35.742105  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:36.258394  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:36.774457  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:37.265308  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:37.665766  6981 solver.cpp:228] Iteration 1900, loss = nan
+I0319 07:25:37.665832  6981 solver.cpp:244]     Train net output #0: loss = nan (* 1 = nan loss)
+I0319 07:25:37.665846  6981 sgd_solver.cpp:106] Iteration 1900, lr = 0.00877687
+I0319 07:25:37.761291  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:38.248757  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:38.745154  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:39.245179  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:39.720161  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:40.204195  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:40.698338  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:40.722391  6981 solver.cpp:337] Iteration 2000, Testing net (#0)
+I0319 07:25:41.166220  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:41.695433  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:42.222990  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:42.749617  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:43.281271  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:43.812876  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:44.351495  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:44.887769  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:45.425444  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:45.640002  6981 solver.cpp:404]     Test net output #0: loss = nan (* 1 = nan loss)
+I0319 07:25:45.640048  6981 solver.cpp:404]     Test net output #1: siamese_accuracy = 0 (* 1 = 0 loss)
+I0319 07:25:45.644661  6981 solver.cpp:228] Iteration 2000, loss = nan
+I0319 07:25:45.644721  6981 solver.cpp:244]     Train net output #0: loss = nan (* 1 = nan loss)
+I0319 07:25:45.644734  6981 sgd_solver.cpp:106] Iteration 2000, lr = 0.00872196
+I0319 07:25:45.873587  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:46.376263  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:46.873387  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:47.366878  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:47.878724  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:48.378756  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:48.622017  6981 solver.cpp:228] Iteration 2100, loss = nan
+I0319 07:25:48.622086  6981 solver.cpp:244]     Train net output #0: loss = nan (* 1 = nan loss)
+I0319 07:25:48.622100  6981 sgd_solver.cpp:106] Iteration 2100, lr = 0.00866784
+I0319 07:25:48.888962  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:49.409157  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:49.917410  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:50.406090  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:50.904440  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:51.404189  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:51.779044  6981 solver.cpp:228] Iteration 2200, loss = nan
+I0319 07:25:51.779116  6981 solver.cpp:244]     Train net output #0: loss = nan (* 1 = nan loss)
+I0319 07:25:51.779131  6981 sgd_solver.cpp:106] Iteration 2200, lr = 0.0086145
+I0319 07:25:51.884963  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:52.404311  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:52.922741  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:53.439486  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:53.957531  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:54.448586  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:54.959216  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:54.993808  6981 solver.cpp:228] Iteration 2300, loss = nan
+I0319 07:25:54.993877  6981 solver.cpp:244]     Train net output #0: loss = nan (* 1 = nan loss)
+I0319 07:25:54.993893  6981 sgd_solver.cpp:106] Iteration 2300, lr = 0.00856192
+I0319 07:25:55.453661  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:55.945943  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:56.449892  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:56.938213  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:57.437521  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:57.931210  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:58.098682  6981 solver.cpp:228] Iteration 2400, loss = nan
+I0319 07:25:58.098752  6981 solver.cpp:244]     Train net output #0: loss = nan (* 1 = nan loss)
+I0319 07:25:58.098765  6981 sgd_solver.cpp:106] Iteration 2400, lr = 0.00851008
+I0319 07:25:58.423035  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:58.910434  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:59.401803  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:25:59.919381  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:26:00.405232  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:26:00.906688  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:26:01.192181  6981 solver.cpp:337] Iteration 2500, Testing net (#0)
+I0319 07:26:01.367976  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:26:01.902019  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:26:02.436142  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:26:02.968740  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:26:03.501365  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:26:04.033852  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:26:04.566340  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:26:05.069159  6981 blocking_queue.cpp:50] Data layer prefetch queue empty
+I0319 07:26:05.097474  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:26:05.629293  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:26:06.118237  6981 solver.cpp:404]     Test net output #0: loss = nan (* 1 = nan loss)
+I0319 07:26:06.118280  6981 solver.cpp:404]     Test net output #1: siamese_accuracy = 0 (* 1 = 0 loss)
+I0319 07:26:06.122757  6981 solver.cpp:228] Iteration 2500, loss = nan
+I0319 07:26:06.122813  6981 solver.cpp:244]     Train net output #0: loss = nan (* 1 = nan loss)
+I0319 07:26:06.122828  6981 sgd_solver.cpp:106] Iteration 2500, lr = 0.00845897
+I0319 07:26:06.158318  6988 blocking_queue.cpp:50] Waiting for data
+I0319 07:26:06.572530  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:26:07.059504  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:26:07.562759  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:26:08.066764  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:26:08.580060  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:26:09.058871  6981 solver.cpp:228] Iteration 2600, loss = nan
+I0319 07:26:09.058936  6981 solver.cpp:244]     Train net output #0: loss = nan (* 1 = nan loss)
+I0319 07:26:09.058997  6981 sgd_solver.cpp:106] Iteration 2600, lr = 0.00840857
+I0319 07:26:09.059384  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:26:09.556246  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:26:10.054023  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:26:10.545774  6986 blocking_queue.cpp:50] Waiting for data
+I0319 07:26:11.044435  6986 blocking_queue.cpp:50] Waiting for data
